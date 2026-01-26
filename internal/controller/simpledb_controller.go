@@ -67,7 +67,11 @@ func (r *SimpleDBReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	// 3. Create Deployment if missing
 	if err != nil && errors.IsNotFound(err) {
-		dep := r.deploymentForSimpleDB(simpledb)
+		dep, err := r.deploymentForSimpleDB(simpledb)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+
 		l.Info("Creating Deployment", "name", dep.Name)
 		if err := r.Create(ctx, dep); err != nil {
 			return ctrl.Result{}, err
@@ -134,7 +138,7 @@ func (r *SimpleDBReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 // deploymentForSimpleDB builds Deployment
-func (r *SimpleDBReconciler) deploymentForSimpleDB(m *databasev1.SimpleDB) *appsv1.Deployment {
+func (r *SimpleDBReconciler) deploymentForSimpleDB(m *databasev1.SimpleDB) (*appsv1.Deployment, error) {
 	labels := labelsForSimpleDB(m.Name)
 	replicas := m.Spec.Replicas
 
@@ -166,7 +170,7 @@ func (r *SimpleDBReconciler) deploymentForSimpleDB(m *databasev1.SimpleDB) *apps
 							Env: []corev1.EnvVar{
 								{
 									Name:  "POSTGRES_PASSWORD",
-									 Value: "changeme", // demo-only; real operators must use Secrets
+									Value: "changeme", // demo-only; real operators must use Secrets
 								},
 							},
 						},
@@ -176,8 +180,11 @@ func (r *SimpleDBReconciler) deploymentForSimpleDB(m *databasev1.SimpleDB) *apps
 		},
 	}
 
-	ctrl.SetControllerReference(m, dep, r.Scheme)
-	return dep
+	if err := ctrl.SetControllerReference(m, dep, r.Scheme); err != nil {
+		return nil, err
+	}
+	return dep, nil
+
 }
 
 // labelsForSimpleDB returns common labels
