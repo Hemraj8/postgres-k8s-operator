@@ -1,0 +1,12 @@
+apiVersion: database.my.domain/v1
+kind: SimpleDB
+metadata:
+  labels:
+    app.kubernetes.io/name: db-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: simpledb-sample
+spec:
+  replicas: 1
+  image: postgres:14
+  dbName: testdb
+
