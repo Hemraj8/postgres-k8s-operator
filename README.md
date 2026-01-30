@@ -1,5 +1,5 @@
 
-# PostgreSQL Kubernetes Operator (Level 4 Cloud Native Project)
+# PostgreSQL Kubernetes Operator 
 
 ![Go Version](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-Operator-326CE5?style=flat&logo=kubernetes)
